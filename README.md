@@ -95,7 +95,7 @@ When a refusal might mean the server has tools newer than this signer knows, the
 ## Keeping it genuine
 
 - **Pin an exact version** in your configuration, as above, and update deliberately.
-- Releases are built and published only by this repository's GitHub Actions workflow, with **npm provenance** linking each version to the commit that built it. Check with `npm audit signatures`.
+- Releases are built only by this repository's GitHub Actions workflow, with **npm provenance** linking each version to the commit that built it (check with `npm audit signatures`). Each release needs two separate human approvals: one in GitHub, then one on npm with two-factor authentication.
 - The published file is not minified, so you can read it and compare it with the source.
 - It has **no runtime dependencies**: installing it downloads this one file and nothing else.
 

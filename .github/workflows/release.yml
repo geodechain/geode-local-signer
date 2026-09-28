@@ -1,8 +1,11 @@
 name: Release
 
-# Runs when a maintainer pushes a version tag (v0.1.0, …). The build job tests and builds the signer;
-# the publish job then waits for an approver in the "npm-release" environment before anything is
-# published. Publishing uses npm trusted publishing (OIDC): no npm token exists anywhere.
+# Runs when a maintainer pushes a version tag (v0.1.0, …). Three gates stand between a tag and users:
+#   1. the build job tests and builds the signer;
+#   2. the publish job waits for an approver in the "npm-release" GitHub environment;
+#   3. it then only STAGES the version on npm (trusted publishing, OIDC, no token anywhere). It goes
+#      live only when a package maintainer approves it on npm with their own two-factor code, so no
+#      single stolen account, GitHub or npm, can release a signer.
 
 on:
   push:
@@ -63,16 +66,16 @@ jobs:
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
-      # Trusted publishing needs npm 11.5.1 or newer.
-      - run: npm install -g npm@11
+      # `npm stage publish` (staged publishing) needs npm 12.
+      - run: npm install -g npm@12.1.0
       - uses: actions/download-artifact@v4
         with:
           name: signer
           path: dist
-      - name: Publish exactly the file that was tested
+      - name: Stage exactly the file that was tested (a maintainer approves it on npm with 2FA)
         run: |
           echo "${{ needs.build.outputs.sha256 }}  dist/geode-local-signer.mjs" | sha256sum -c -
-          npm publish --provenance --access public
+          npm stage publish --provenance --access public
       - name: GitHub Release with the file and its checksum
         env:
           GH_TOKEN: ${{ github.token }}
@@ -80,4 +83,4 @@ jobs:
         run: |
           gh release create "$GITHUB_REF_NAME" dist/geode-local-signer.mjs dist/SHA256SUMS \
             --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" \
-            --notes "sha256 of geode-local-signer.mjs is $SHA256. See CHANGELOG.md."
+            --notes "sha256 of geode-local-signer.mjs is $SHA256. Staged on npm; it becomes installable once a maintainer approves it there with two-factor authentication. See CHANGELOG.md."

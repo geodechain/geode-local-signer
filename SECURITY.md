@@ -25,7 +25,7 @@ This repository is generated from Geode's private MCP monorepo, which is the sin
 
 ## Verifying a release
 
-Every npm release is built and published by this repository's GitHub Actions workflow, with npm provenance. You can check that the package you installed was built from this repository:
+Every npm release is built by this repository's GitHub Actions workflow, approved in GitHub, staged on npm with provenance, and made public only when a maintainer approves it on npm with two-factor authentication. You can check that the package you installed was built from this repository:
 
 ```bash
 npm audit signatures
