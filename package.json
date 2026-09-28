@@ -1,0 +1,72 @@
+{
+  "name": "@geodechain/local-signer",
+  "version": "0.1.0",
+  "description": "Signs Geode blockchain transactions on your own machine for AI agents using the Geode MCP server. Verifies every transaction independently; keys never leave your computer.",
+  "license": "Apache-2.0",
+  "author": "The Geode Foundation Inc",
+  "homepage": "https://github.com/geodechain/geode-local-signer#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/geodechain/geode-local-signer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/geodechain/geode-local-signer/issues"
+  },
+  "keywords": [
+    "geode",
+    "mcp",
+    "model-context-protocol",
+    "signer",
+    "substrate",
+    "polkadot",
+    "ai-agent"
+  ],
+  "type": "module",
+  "bin": {
+    "geode-local-signer": "dist/geode-local-signer.mjs"
+  },
+  "files": [
+    "dist/geode-local-signer.mjs",
+    "README.md",
+    "LICENSE",
+    "NOTICE",
+    "CHANGELOG.md",
+    "SECURITY.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "node scripts/build-signer.ts",
+    "smoke": "node scripts/smoke-signer.ts dist/geode-local-signer.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "check-hidden": "node scripts/check-hidden-chars.ts",
+    "check-version": "node -e \"const v=require('./package.json').version;const s=require('fs').readFileSync('packages/local-signer/src/version.ts','utf8');if(!s.includes('\\\"'+v+'\\\"')){console.error('version.ts does not match package.json '+v);process.exit(1)}\""
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@modelcontextprotocol/sdk": "1.30.0",
+    "@polkadot/keyring": "14.0.3",
+    "@polkadot/types": "16.5.6",
+    "@polkadot/util": "14.0.3",
+    "@polkadot/util-crypto": "14.0.3",
+    "@types/node": "22.20.4",
+    "esbuild": "0.28.2",
+    "eslint": "10.11.0",
+    "eslint-plugin-security": "4.0.1",
+    "fast-check": "4.10.2",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.70.0",
+    "vitest": "5.0.1",
+    "zod": "4.6.5"
+  }
+}

@@ -1,0 +1,13 @@
+node_modules/
+dist/
+coverage/
+*.log
+.env
+.env.*
+# Never commit key material or passwords, even for tests.
+*.pw
+*.mnemonic.txt
+*-password.txt
+*RECOVERY-PHRASE*
+keystores/
+.DS_Store

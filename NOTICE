@@ -1,0 +1,8 @@
+Geode local signer
+Copyright 2026 The Geode Foundation Inc
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+The published file dist/geode-local-signer.mjs bundles third-party open-source
+packages (among them @polkadot/*, @noble/*, @modelcontextprotocol/sdk and zod).
+Their license notices are reproduced at the end of that file.
