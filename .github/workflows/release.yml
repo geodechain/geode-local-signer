@@ -76,4 +76,8 @@ jobs:
       - name: GitHub Release with the file and its checksum
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" dist/geode-local-signer.mjs dist/SHA256SUMS --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --notes "sha256 of geode-local-signer.mjs: ${{ needs.build.outputs.sha256 }}. See CHANGELOG.md."
+          SHA256: ${{ needs.build.outputs.sha256 }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/geode-local-signer.mjs dist/SHA256SUMS \
+            --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" \
+            --notes "sha256 of geode-local-signer.mjs is $SHA256. See CHANGELOG.md."
