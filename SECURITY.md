@@ -12,6 +12,10 @@ Email **support@geodechain.com** with "SECURITY" in the subject line. Please inc
 
 Please **do not** open a public GitHub issue for a vulnerability, and do not test against accounts that are not yours. We will acknowledge your report, keep you informed, and credit you in the release notes if you wish.
 
+## How this repository is maintained
+
+This repository is generated from Geode's private MCP monorepo, which is the single source of truth. Changes, including dependency updates, are made there, tested, and exported here; pull requests opened directly against this repository cannot be merged as they are, but are welcome as reports.
+
 ## What is in scope
 
 - The signer signing anything other than what it claims to have verified.
