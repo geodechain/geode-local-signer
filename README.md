@@ -25,7 +25,7 @@ Add the signer to your agent's MCP configuration, next to the Geode server. Use 
     "geode-signer": {
       "command": "npx",
       "args": [
-        "-y", "@geodechain/local-signer@0.1.0",
+        "-y", "@geodechain/local-signer@0.1.1",
         "--dir", "/Users/you/geode-keys",
         "--server", "https://mcp.geodeapps.com/mcp",
         "--per-tx-geode", "50",
@@ -47,7 +47,7 @@ mkdir -p ~/geode-keys && chmod 700 ~/geode-keys
 ```bash
 git clone https://github.com/geodechain/geode-local-signer.git
 cd geode-local-signer
-git checkout v0.1.0
+git checkout v0.1.1
 npm ci
 npm test
 npm run build            # → dist/geode-local-signer.mjs
