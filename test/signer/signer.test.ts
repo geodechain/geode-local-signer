@@ -31,7 +31,7 @@ function contractCall(t: ToolDef, args: Record<string, unknown>, o: { value?: bi
   return tx.contracts.call(o.dest ?? addr(t.contract), o.value ?? 0n, { refTime: 5_000_000_000n, proofSize: 100_000n }, GEODE, toHex(data));
 }
 
-const intent = (signer: string, toolName: string, method: unknown, extra: { genesisHash?: string; immortal?: boolean } = {}) => ({
+const intent = (signer: string, toolName: string, method: unknown, extra: { genesisHash?: string; immortal?: boolean; runtime?: { specVersion: number; transactionVersion: number } } = {}) => ({
   intent_id: `it-${Math.random().toString(36).slice(2)}`,
   tool: toolName,
   signer,
@@ -76,7 +76,7 @@ describe("signing a well-formed intent", () => {
   it("reports what it verified: tool, contract, value and validity window", async () => {
     const { signer, address } = await withAccount();
     const r = signer.signIntent(intent(address, CHECKOUT.name, contractCall(CHECKOUT, { deliver_to_address: "digital" }, { value: 25n * GEODE })));
-    expect(r.verified).toMatchObject({ tool: CHECKOUT.name, contract: "Market", value_geode: "25", valid_for_blocks: 64 });
+    expect(r.verified).toMatchObject({ tool: CHECKOUT.name, contract: "Market", value_geode: "25", valid_for_blocks: 64, spec_version: 20260115, transaction_version: 2 });
   });
 });
 
@@ -138,6 +138,25 @@ describe("refusals", () => {
   it("signs a tool it knows even when the server's tool list is newer", async () => {
     const { signer, address } = await withAccount();
     expect(signer.signIntent({ ...intent(address, POST.name, contractCall(POST, POST_ARGS)), registry_version: "ffffffffffffffff" }).ok).toBe(true);
+  });
+
+  it("refuses a payload made for any runtime it has not been checked against, and says to update", async () => {
+    const { signer, address, dir } = await withAccount();
+    const transfer = tx.balances.transferKeepAlive(BOB, 5n * GEODE);
+    for (const runtime of [
+      { specVersion: 0xffffffff, transactionVersion: 2 },
+      { specVersion: 20260116, transactionVersion: 2 },
+      { specVersion: 20260114, transactionVersion: 2 },
+      { specVersion: 20260115, transactionVersion: 3 },
+      { specVersion: 20260115, transactionVersion: 0xffffffff },
+    ]) {
+      // The server's registry_version matches, so the hint cannot come from the server.
+      const t = { ...intent(address, "geode_balances_transfer", transfer, { runtime }), registry_version: REGISTRY_VERSION };
+      refused(() => signer.signIntent(t, { dest: BOB, amount: "5" }), /REFUSED to sign: payload is for Geode runtime .*update your signer/);
+      refused(() => signer.signIntent({ ...intent(address, POST.name, contractCall(POST, POST_ARGS), { runtime }), registry_version: REGISTRY_VERSION }), /Geode runtime/);
+    }
+    // Nothing was signed, so nothing was counted against the daily cap.
+    expect(readdirSync(dir)).not.toContain(".spend-ledger.jsonl");
   });
 
   it("refuses garbage instead of signing it", async () => {

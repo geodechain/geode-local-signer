@@ -6,6 +6,8 @@ import {
   CONTRACTS,
   GEODE_MAINNET,
   PayloadError,
+  RuntimeVersionError,
+  checkRuntimeVersion,
   ScaleReader,
   ScaleWriter,
   SKIPPED,
@@ -19,7 +21,7 @@ import {
   type VerifyOptions,
 } from "../../packages/shared/src/index.ts";
 import { ALICE, BOB, FORMAT } from "../helpers/accounts.ts";
-import { BLOCK_HASH, buildPayload, tx } from "../helpers/polkadotOffline.ts";
+import { BLOCK_HASH, SPEC, buildPayload, consts, tx } from "../helpers/polkadotOffline.ts";
 
 const tool = (name: string): ToolDef => TOOLS.find((t) => t.name === name)!;
 const addr = (contract: string): string => CONTRACTS.find((c) => c.name === contract)!.address;
@@ -91,6 +93,63 @@ describe("pinned layout matches polkadot.js with real Geode metadata", () => {
     const pair = new Keyring({ type: "sr25519" }).addFromUri("//McpTest");
     const sig = pair.sign(signingMessage(bytes));
     expect(signatureVerify(signingMessage(bytes), sig, pair.address).isValid).toBe(true);
+  });
+});
+
+describe("verifyPayload pins the runtime version", () => {
+  const send = tool("geode_social_send_message_public");
+  const args = { new_message: "[MCP-TEST] hi", photo_or_youtube_link: "", website_or_document_link: "" };
+  const OFF_PIN = [
+    { specVersion: 0xffffffff, transactionVersion: 2 },
+    { specVersion: 0xdeadbeef, transactionVersion: 2 },
+    { specVersion: 20260116, transactionVersion: 2 },
+    { specVersion: 20260114, transactionVersion: 2 },
+    { specVersion: 0, transactionVersion: 2 },
+    { specVersion: 20260115, transactionVersion: 1 },
+    { specVersion: 20260115, transactionVersion: 3 },
+    { specVersion: 20260115, transactionVersion: 0xffffffff },
+  ];
+
+  it("matches the runtime version recorded in the real Geode metadata", () => {
+    const v = consts.system.version;
+    expect(GEODE_MAINNET.specVersions).toContain(v.specVersion.toNumber());
+    expect(v.transactionVersion.toNumber()).toBe(GEODE_MAINNET.transactionVersion);
+    expect(GEODE_MAINNET.specVersions).toContain(SPEC.specVersion);
+    expect(SPEC.transactionVersion).toBe(GEODE_MAINNET.transactionVersion);
+  });
+
+  it("accepts the pinned runtime and reports it", () => {
+    const v = verifyPayload(buildPayload({ address: ALICE, method: contractCall(send, args) }), OPTS(send.name));
+    expect(v.payload.specVersion).toBe(20260115);
+    expect(v.payload.txVersion).toBe(2);
+  });
+
+  it.each(OFF_PIN)("refuses a contract call for runtime %o", (runtime) => {
+    const p = buildPayload({ address: ALICE, method: contractCall(send, args), runtime });
+    expect(decodeSigningPayload(p).specVersion).toBe(runtime.specVersion);
+    expect(() => verifyPayload(p, OPTS(send.name))).toThrow(RuntimeVersionError);
+    expect(() => verifyPayload(p, OPTS(send.name))).toThrow(/Geode runtime/);
+  });
+
+  it.each(OFF_PIN)("refuses a matching transfer for runtime %o", (runtime) => {
+    const p = buildPayload({ address: ALICE, method: tx.balances.transferKeepAlive(BOB, 5n * GEODE), runtime });
+    expect(() => verifyPayload(p, OPTS("geode_balances_transfer", { expectTransfer: { dest: BOB, amount: 5n * GEODE } }))).toThrow(RuntimeVersionError);
+  });
+
+  it("reports the runtime first, before trying to read a call the new runtime may have changed", () => {
+    // Under the pins this call is refused as unknown; under another runtime, the version is the reason.
+    const m = tx.balances.transfer(BOB, GEODE);
+    expect(() => verifyPayload(buildPayload({ address: ALICE, method: m }), OPTS("geode_balances_transfer"))).toThrow(/not an allowed call/);
+    expect(() => verifyPayload(buildPayload({ address: ALICE, method: m, runtime: OFF_PIN[2]! }), OPTS("geode_balances_transfer"))).toThrow(RuntimeVersionError);
+  });
+
+  it("checkRuntimeVersion (also used by the server at startup) accepts only the pins", () => {
+    expect(() => checkRuntimeVersion(20260115, 2)).not.toThrow();
+    for (const r of OFF_PIN) expect(() => checkRuntimeVersion(r.specVersion, r.transactionVersion)).toThrow(RuntimeVersionError);
+  });
+
+  it("is a PayloadError, so every existing refusal path still refuses", () => {
+    expect(new RuntimeVersionError("x")).toBeInstanceOf(PayloadError);
   });
 });
 

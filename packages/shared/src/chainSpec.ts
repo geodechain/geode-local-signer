@@ -8,6 +8,15 @@ export const GEODE_MAINNET = {
   ss58Prefix: 42,
   decimals: 12,
   extrinsicVersion: 4,
+  /**
+   * Runtime versions whose transaction layout has been checked against these pins. The chain only
+   * accepts a signature made for its live runtime, so a payload naming any other runtime is refused:
+   * after an upgrade, bytes that decode as an allowed call under these pins could mean something else
+   * to the new runtime. Add a version here only after checking its metadata against every pin below.
+   */
+  specVersions: [20260115],
+  /** Substrate raises this whenever call indices or argument layouts change. */
+  transactionVersion: 2,
   /** Signed extensions in order. Extra (in the payload after the call): era, nonce, tip + assetId. */
   signedExtensions: [
     "CheckNonZeroSender",

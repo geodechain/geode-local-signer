@@ -14,6 +14,7 @@ import {
   GEODE_MAINNET,
   PayloadError,
   REGISTRY_VERSION,
+  RuntimeVersionError,
   formatBalance,
   parseBalance,
   signingMessage,
@@ -42,6 +43,14 @@ export const UPDATE_COMMAND = "npx @geodechain/local-signer@latest";
 function outdatedHint(serverRegistry: unknown): string {
   if (typeof serverRegistry !== "string" || serverRegistry === REGISTRY_VERSION) return "";
   return ` (this signer's tool list, version ${REGISTRY_VERSION}, differs from the server's, ${serverRegistry.slice(0, 32)}: if the server has added or changed tools, update your signer with \`${UPDATE_COMMAND}\`)`;
+}
+
+/**
+ * Wording for a refusal caused by the payload's runtime version. It rests only on what this signer
+ * decoded itself, never on anything the server says, so a server cannot suppress it.
+ */
+function runtimeHint(): string {
+  return ` (if Geode has upgraded its runtime, update your signer with \`${UPDATE_COMMAND}\`; nothing was signed)`;
 }
 
 export const FORMAT: ChainFormat = { outputSs58Prefix: GEODE_MAINNET.ss58Prefix, acceptedSs58Prefixes: [GEODE_MAINNET.ss58Prefix], decimals: GEODE_MAINNET.decimals };
@@ -186,6 +195,7 @@ export class LocalSigner {
         ...(expect ? { expectTransfer: { dest: expect.dest, amount: parseBalance("expect.amount", expect.amount, FORMAT.decimals) } } : {}),
       });
     } catch (e) {
+      if (e instanceof RuntimeVersionError) throw new SignerError(`REFUSED to sign: ${e.message}${runtimeHint()}`);
       if (e instanceof PayloadError) throw new SignerError(`REFUSED to sign: ${e.message}${outdatedHint(intent.registry_version)}`);
       throw e;
     }
@@ -217,6 +227,8 @@ export class LocalSigner {
         ...(call.kind === "contracts.call" && call.storageDepositLimit !== null ? { storage_deposit_limit_geode: formatBalance(call.storageDepositLimit, FORMAT.decimals) } : {}),
         nonce: verified.payload.nonce.toString(),
         valid_for_blocks: verified.payload.era.mortal ? verified.payload.era.period : null,
+        spec_version: verified.payload.specVersion,
+        transaction_version: verified.payload.txVersion,
       },
     };
   }

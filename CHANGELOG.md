@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1
+
+Security fix. Please update.
+
+- The signer now checks the runtime version (`specVersion` and `transactionVersion`) in every payload and refuses any runtime it has not been checked against. Before, these fields were decoded but not compared to anything. After a Geode runtime upgrade that changed call layouts, a malicious or compromised server could have used an older signer to sign bytes that the signer read as one allowed action but the chain would run as another. No such upgrade has happened; Geode mainnet still runs runtime 20260115 (transaction version 2).
+- When a payload names another runtime, the refusal tells you to update your signer. The signer decides this from the payload alone; the server cannot switch the message off.
+- `sign_intent` and `sign_and_submit` now report the `spec_version` and `transaction_version` they verified.
+
 ## 0.1.0
 
 First public release.

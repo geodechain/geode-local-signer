@@ -84,6 +84,7 @@ Then use `"command": "node", "args": ["/full/path/to/dist/geode-local-signer.mjs
 ## What it refuses to sign
 
 - a transaction for another chain, or one that never expires;
+- a transaction made for a Geode runtime version this signer hasn't been checked against (after Geode upgrades its runtime, the refusal tells you to update your signer);
 - anything other than a call to one of Geode's eight app contracts or a keep-alive GEODE transfer (so it can never empty your account);
 - an action that isn't in its tool list, or a payload that doesn't match the action it claims;
 - GEODE attached to an action that doesn't take payment;

@@ -16,6 +16,21 @@ import type { ArgKind, ToolDef } from "./types.ts";
 
 export class PayloadError extends Error {}
 
+/** The payload names a runtime this software has not been checked against (usually: Geode upgraded). */
+export class RuntimeVersionError extends PayloadError {}
+
+/** Bytes at the end of every v4 signing payload: specVersion u32, txVersion u32, genesis, block hash. */
+const VERSIONS_TAIL = 4 + 4 + 32 + 32;
+
+/** Throws RuntimeVersionError unless this runtime's transaction layout matches the pins in chainSpec.ts. */
+export function checkRuntimeVersion(specVersion: number, txVersion: number): void {
+  const known = GEODE_MAINNET.specVersions as readonly number[];
+  if (known.includes(specVersion) && txVersion === GEODE_MAINNET.transactionVersion) return;
+  throw new RuntimeVersionError(
+    `payload is for Geode runtime ${specVersion} (transaction version ${txVersion}), but this software is pinned to runtime ${known.join(", ")} (transaction version ${GEODE_MAINNET.transactionVersion})`,
+  );
+}
+
 export type DecodedCall =
   | {
       kind: "contracts.call";
@@ -184,7 +199,14 @@ export interface VerifiedIntent {
 
 /** Throws PayloadError unless the payload is an allowed, well-formed call matching `toolName`. */
 export function verifyPayload(bytes: Uint8Array, opts: VerifyOptions): VerifiedIntent {
+  // Checked first, from the fixed-size tail, because under a different runtime the call itself may not
+  // decode (or may decode as the wrong call). The full decode below must then agree with the tail.
+  if (bytes.length >= VERSIONS_TAIL) {
+    const tail = new DataView(bytes.buffer, bytes.byteOffset + bytes.length - VERSIONS_TAIL, 8);
+    checkRuntimeVersion(tail.getUint32(0, true), tail.getUint32(4, true));
+  }
   const p = decodeSigningPayload(bytes);
+  checkRuntimeVersion(p.specVersion, p.txVersion);
   if (p.genesisHash !== GEODE_MAINNET.genesisHash) throw new PayloadError(`payload is for another chain (genesis ${p.genesisHash})`);
   if (!p.era.mortal) throw new PayloadError("payload is immortal; only mortal transactions are signed");
   if (p.era.period > MAX_ERA_PERIOD) throw new PayloadError(`validity window ${p.era.period} blocks exceeds ${MAX_ERA_PERIOD}`);

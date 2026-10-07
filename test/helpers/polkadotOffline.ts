@@ -17,8 +17,11 @@ registry.setMetadata(metadata, [...GEODE_MAINNET.signedExtensions]);
 // returns a plain Codec.
 registry.setChainProperties(registry.createType("ChainProperties", { ss58Format: 42, tokenDecimals: [12], tokenSymbol: ["GEODE"] }) as Parameters<typeof registry.setChainProperties>[0]);
 
+const expanded = expandMetadata(registry, metadata);
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const tx = expandMetadata(registry, metadata).tx as any;
+export const tx = expanded.tx as any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const consts = expanded.consts as any;
 
 export const SPEC = { specVersion: 20260115, transactionVersion: 2 };
 export const BLOCK_HASH = "0x" + "cd".repeat(32);
@@ -32,6 +35,8 @@ export interface PayloadOpts {
   period?: number;
   genesisHash?: string;
   immortal?: boolean;
+  /** Defaults to the pinned runtime; set to build a payload for another (e.g. upgraded) runtime. */
+  runtime?: { specVersion: number; transactionVersion: number };
 }
 
 /** Build a signing payload exactly as polkadot.js (and wallet extensions) would. */
@@ -45,7 +50,7 @@ export function buildPayload(o: PayloadOpts): Uint8Array {
     genesisHash: o.genesisHash ?? GEODE_MAINNET.genesisHash,
     method: o.method,
     nonce: o.nonce ?? 7,
-    runtimeVersion: SPEC,
+    runtimeVersion: o.runtime ?? SPEC,
     signedExtensions: [...GEODE_MAINNET.signedExtensions],
     tip: o.tip ?? 0,
     version: 4,

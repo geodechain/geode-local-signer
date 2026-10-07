@@ -8,7 +8,7 @@ export type { ChainFormat } from "./codec.ts";
 export { ScaleError, ScaleReader, ScaleWriter } from "./scale.ts";
 export { findForbiddenChar, stripHidden, toHex } from "./text.ts";
 export { GEODE_MAINNET, MAX_ERA_PERIOD } from "./chainSpec.ts";
-export { PayloadError, decodeCall, decodeContractArgs, decodeSigningPayload, signingMessage, verifyPayload } from "./payload.ts";
+export { PayloadError, RuntimeVersionError, checkRuntimeVersion, decodeCall, decodeContractArgs, decodeSigningPayload, signingMessage, verifyPayload } from "./payload.ts";
 export type { DecodedCall, DecodedPayload, VerifiedIntent, VerifyOptions } from "./payload.ts";
 export { decodeFields } from "./codec.ts";
 export { decodeContractEvent } from "./events.ts";
