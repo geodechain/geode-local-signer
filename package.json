@@ -1,6 +1,6 @@
 {
   "name": "@geodechain/local-signer",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Signs Geode blockchain transactions on your own machine for AI agents using the Geode MCP server. Verifies every transaction independently; keys never leave your computer.",
   "license": "Apache-2.0",
   "author": "The Geode Foundation Inc",
@@ -54,7 +54,7 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
-    "@modelcontextprotocol/sdk": "1.31.0",
+    "@modelcontextprotocol/sdk": "1.32.0",
     "@polkadot/keyring": "14.0.3",
     "@polkadot/types": "16.5.6",
     "@polkadot/util": "14.0.3",
@@ -66,7 +66,7 @@
     "fast-check": "4.10.2",
     "typescript": "6.0.3",
     "typescript-eslint": "8.70.0",
-    "vitest": "5.0.1",
-    "zod": "4.6.5"
+    "vitest": "5.0.3",
+    "zod": "4.6.6"
   }
 }

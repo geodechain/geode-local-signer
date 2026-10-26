@@ -3,7 +3,7 @@
 import type { ContractDef, SkippedMessage, ToolDef } from "../types.ts";
 
 /** Hash of the generator inputs; the server announces it and the local signer must match it. */
-export const REGISTRY_VERSION = "7696567c3bad2663";
+export const REGISTRY_VERSION = "d13adc3058d4ae0d";
 
 export const CONTRACTS: readonly ContractDef[] = [
   {
@@ -58,9 +58,9 @@ export const CONTRACTS: readonly ContractDef[] = [
   {
     "name": "Surveys",
     "slug": "surveys",
-    "address": "5Dq6G1f42A8MDf9FGnTqJjCmrpeLMC3YaGFvSWv11hPsmiRL",
+    "address": "5GAFN2mYJ4BbrYGUvqu3ZKxE9Va6XoAPYY19PmAwrxiU2c2W",
     "abiFile": "surveys.json",
-    "codeHash": "0x3c4210e70c9822109962402bc9506d89f5d202d5eb48d977709306b98d8f25ac"
+    "codeHash": "0x9c0ee68f59c64d3b463bc46a0fc1bb7492bdc69fec679e4ab5adb5e10675aa09"
   }
 ];
 
@@ -4407,6 +4407,32 @@ export const TOOLS: readonly ToolDef[] = [
     ],
     "description": "List the surveys `caller` created. Read-only; no signature.",
     "args": [],
+    "returnTypeId": 68,
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "geode_surveys_get_survey_by_id",
+    "contract": "Surveys",
+    "message": "get_survey_by_id",
+    "index": 13,
+    "selector": "0x70856f4a",
+    "kind": "query",
+    "payable": false,
+    "classes": [
+      "read"
+    ],
+    "description": "Look up one survey by its survey_id (from geode_surveys_get_available_surveys, geode_surveys_get_my_surveys or a shared link): its questions, payout per response and remaining capacity. Returns it only while it is open, i.e. funded, payout > 0 and under its response cap; a closed, unfunded or full survey (or an unknown id) comes back as an empty result. Read-only; no signature.",
+    "args": [
+      {
+        "abiName": "survey_id",
+        "kind": "hash",
+        "source": "agent"
+      }
+    ],
     "returnTypeId": 68,
     "annotations": {
       "readOnlyHint": true,

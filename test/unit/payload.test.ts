@@ -74,7 +74,7 @@ describe("pinned layout matches polkadot.js with real Geode metadata", () => {
     expect(p.tip).toBe(0n);
     expect(p.assetId).toBeNull();
     expect(p.era).toMatchObject({ mortal: true, period: 64 });
-    expect(p.specVersion).toBe(20260115);
+    expect(p.specVersion).toBe(SPEC.specVersion);
     expect(p.txVersion).toBe(2);
     expect(p.genesisHash).toBe(GEODE_MAINNET.genesisHash);
     expect(p.blockHash).toBe(BLOCK_HASH);
@@ -104,10 +104,14 @@ describe("verifyPayload pins the runtime version", () => {
     { specVersion: 0xdeadbeef, transactionVersion: 2 },
     { specVersion: 20260116, transactionVersion: 2 },
     { specVersion: 20260114, transactionVersion: 2 },
+    { specVersion: 20261017, transactionVersion: 2 },
+    { specVersion: 20261019, transactionVersion: 2 },
     { specVersion: 0, transactionVersion: 2 },
     { specVersion: 20260115, transactionVersion: 1 },
     { specVersion: 20260115, transactionVersion: 3 },
-    { specVersion: 20260115, transactionVersion: 0xffffffff },
+    { specVersion: 20261018, transactionVersion: 1 },
+    { specVersion: 20261018, transactionVersion: 3 },
+    { specVersion: 20261018, transactionVersion: 0xffffffff },
   ];
 
   it("matches the runtime version recorded in the real Geode metadata", () => {
@@ -120,8 +124,13 @@ describe("verifyPayload pins the runtime version", () => {
 
   it("accepts the pinned runtime and reports it", () => {
     const v = verifyPayload(buildPayload({ address: ALICE, method: contractCall(send, args) }), OPTS(send.name));
-    expect(v.payload.specVersion).toBe(20260115);
+    expect(v.payload.specVersion).toBe(20261018);
     expect(v.payload.txVersion).toBe(2);
+  });
+
+  it("still accepts the previous pinned runtime, whose layout is identical", () => {
+    const v = verifyPayload(buildPayload({ address: ALICE, method: contractCall(send, args), runtime: { specVersion: 20260115, transactionVersion: 2 } }), OPTS(send.name));
+    expect(v.payload.specVersion).toBe(20260115);
   });
 
   it.each(OFF_PIN)("refuses a contract call for runtime %o", (runtime) => {
@@ -145,6 +154,7 @@ describe("verifyPayload pins the runtime version", () => {
 
   it("checkRuntimeVersion (also used by the server at startup) accepts only the pins", () => {
     expect(() => checkRuntimeVersion(20260115, 2)).not.toThrow();
+    expect(() => checkRuntimeVersion(20261018, 2)).not.toThrow();
     for (const r of OFF_PIN) expect(() => checkRuntimeVersion(r.specVersion, r.transactionVersion)).toThrow(RuntimeVersionError);
   });
 

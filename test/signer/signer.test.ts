@@ -76,7 +76,7 @@ describe("signing a well-formed intent", () => {
   it("reports what it verified: tool, contract, value and validity window", async () => {
     const { signer, address } = await withAccount();
     const r = signer.signIntent(intent(address, CHECKOUT.name, contractCall(CHECKOUT, { deliver_to_address: "digital" }, { value: 25n * GEODE })));
-    expect(r.verified).toMatchObject({ tool: CHECKOUT.name, contract: "Market", value_geode: "25", valid_for_blocks: 64, spec_version: 20260115, transaction_version: 2 });
+    expect(r.verified).toMatchObject({ tool: CHECKOUT.name, contract: "Market", value_geode: "25", valid_for_blocks: 64, spec_version: 20261018, transaction_version: 2 });
   });
 });
 
@@ -147,8 +147,10 @@ describe("refusals", () => {
       { specVersion: 0xffffffff, transactionVersion: 2 },
       { specVersion: 20260116, transactionVersion: 2 },
       { specVersion: 20260114, transactionVersion: 2 },
+      { specVersion: 20261019, transactionVersion: 2 },
       { specVersion: 20260115, transactionVersion: 3 },
-      { specVersion: 20260115, transactionVersion: 0xffffffff },
+      { specVersion: 20261018, transactionVersion: 3 },
+      { specVersion: 20261018, transactionVersion: 0xffffffff },
     ]) {
       // The server's registry_version matches, so the hint cannot come from the server.
       const t = { ...intent(address, "geode_balances_transfer", transfer, { runtime }), registry_version: REGISTRY_VERSION };

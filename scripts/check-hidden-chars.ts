@@ -7,9 +7,11 @@ import { join } from "node:path";
 
 import { FORBIDDEN_RANGES } from "../packages/shared/src/text.ts";
 
-const ROOTS = ["packages", "scripts", "test", "manifest", "docs", "deploy"];
-const EXTENSIONS = /\.(ts|js|json|ya?ml|md)$/;
+const ROOTS = ["packages", "scripts", "test", "manifest", "docs", "deploy", "contracts"];
+const EXTENSIONS = /\.(ts|js|json|ya?ml|md|sol|toml)$/;
 const SKIP_DIRS = new Set(["node_modules", "dist", "coverage"]);
+// Third-party submodules (forge-std, OpenZeppelin, pinned by commit) and Foundry build output.
+const SKIP_PATHS = new Set(["contracts/lib", "contracts/out", "contracts/cache"]);
 
 function* walk(dir: string): Generator<string> {
   let entries: string[];
@@ -21,6 +23,7 @@ function* walk(dir: string): Generator<string> {
   for (const e of entries) {
     if (SKIP_DIRS.has(e)) continue;
     const p = join(dir, e);
+    if (SKIP_PATHS.has(p)) continue;
     if (statSync(p).isDirectory()) yield* walk(p);
     else if (EXTENSIONS.test(p)) yield p;
   }

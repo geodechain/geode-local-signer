@@ -1,5 +1,5 @@
 /**
- * Offline polkadot.js type registry loaded with Geode mainnet metadata (runtime 20260115), used as the
+ * Offline polkadot.js type registry loaded with Geode mainnet metadata (runtime 20261018), used as the
  * reference implementation that our independent payload decoder is checked against.
  */
 import { readFileSync } from "node:fs";
@@ -8,7 +8,7 @@ import { Metadata, TypeRegistry, expandMetadata } from "@polkadot/types";
 
 import { GEODE_MAINNET } from "../../packages/shared/src/index.ts";
 
-const hex = readFileSync(new URL("../fixtures/geode-metadata-20260115.hex", import.meta.url), "utf8").trim();
+const hex = readFileSync(new URL("../fixtures/geode-metadata-20261018.hex", import.meta.url), "utf8").trim();
 
 export const registry = new TypeRegistry();
 const metadata = new Metadata(registry, hex as `0x${string}`);
@@ -23,7 +23,7 @@ export const tx = expanded.tx as any;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const consts = expanded.consts as any;
 
-export const SPEC = { specVersion: 20260115, transactionVersion: 2 };
+export const SPEC = { specVersion: 20261018, transactionVersion: 2 };
 export const BLOCK_HASH = "0x" + "cd".repeat(32);
 
 export interface PayloadOpts {

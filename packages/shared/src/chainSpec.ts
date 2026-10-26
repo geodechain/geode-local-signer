@@ -1,7 +1,9 @@
 /**
  * Pinned facts about Geode mainnet's transaction format (read from runtime spec 20260115 metadata,
- * 2026-09-19). The local signer decodes payloads with these pins and no chain connection; the server
- * verifies at startup that the live runtime still matches them and refuses to start otherwise.
+ * 2026-09-19). Runtime 20261018 was checked against every pin on 2026-10-26: apart from the runtime
+ * version itself, its metadata is identical. The local signer decodes payloads with these pins and no
+ * chain connection; the server verifies at startup that the live runtime still matches them and
+ * refuses to start otherwise.
  */
 export const GEODE_MAINNET = {
   genesisHash: "0xfa294dfb0e74160a9800d56231927655ba43d52add29c1982ab59574cc51cc90",
@@ -14,7 +16,7 @@ export const GEODE_MAINNET = {
    * after an upgrade, bytes that decode as an allowed call under these pins could mean something else
    * to the new runtime. Add a version here only after checking its metadata against every pin below.
    */
-  specVersions: [20260115],
+  specVersions: [20260115, 20261018],
   /** Substrate raises this whenever call indices or argument layouts change. */
   transactionVersion: 2,
   /** Signed extensions in order. Extra (in the payload after the call): era, nonce, tip + assetId. */

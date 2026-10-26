@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.2
+
+Please update: signers older than 0.1.2 cannot sign for Geode mainnet any more.
+
+- Geode mainnet upgraded to runtime 20261018 (transaction version 2). The signer now accepts it. Its metadata was checked against every pinned call and signed extension: apart from the runtime version itself, it is identical to runtime 20260115, so nothing the signer checks has changed.
+- Runtime 20260115 is still accepted.
+- Surveys: the signer now knows the redeployed Surveys contract (5GAFN2mYJ4BbrYGUvqu3ZKxE9Va6XoAPYY19PmAwrxiU2c2W) and the new read-only `geode_surveys_get_survey_by_id` tool. Older signers refuse survey transactions to the new contract.
+- Dependency updates for recently published advisories: `@modelcontextprotocol/sdk` 1.32.0 and `zod` 4.6.6, both bundled into the signer.
+
 ## 0.1.1
 
 Security fix. Please update.
