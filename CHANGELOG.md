@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.3
+
+Please update if you use surveys: signers older than 0.1.3 refuse survey transactions to the new Surveys contract.
+
+- Surveys: the signer now knows the redeployed Surveys contract (5GA2fALL7H7eNdU2d3NnbnPydXpS4Ntny3gXeZQjC741Crbo). The new contract fixes the Available Surveys list and the refund when you close a survey, and `close_my_survey` with the wrong survey length now fails with `WrongSurveyLength`. Survey messages, their selectors and arguments are unchanged.
+- Nothing else changed.
+
 ## 0.1.2
 
 Please update: signers older than 0.1.2 cannot sign for Geode mainnet any more.

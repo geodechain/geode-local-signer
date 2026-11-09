@@ -3,7 +3,7 @@
 import type { ContractDef, SkippedMessage, ToolDef } from "../types.ts";
 
 /** Hash of the generator inputs; the server announces it and the local signer must match it. */
-export const REGISTRY_VERSION = "d13adc3058d4ae0d";
+export const REGISTRY_VERSION = "ba92e2bbcdbb1c58";
 
 export const CONTRACTS: readonly ContractDef[] = [
   {
@@ -58,9 +58,9 @@ export const CONTRACTS: readonly ContractDef[] = [
   {
     "name": "Surveys",
     "slug": "surveys",
-    "address": "5GAFN2mYJ4BbrYGUvqu3ZKxE9Va6XoAPYY19PmAwrxiU2c2W",
+    "address": "5GA2fALL7H7eNdU2d3NnbnPydXpS4Ntny3gXeZQjC741Crbo",
     "abiFile": "surveys.json",
-    "codeHash": "0x9c0ee68f59c64d3b463bc46a0fc1bb7492bdc69fec679e4ab5adb5e10675aa09"
+    "codeHash": "0x16cea7e738aba7426d2a9b5a69ce10d6b02e18b3f018a61307ae449fae186fd2"
   }
 ];
 

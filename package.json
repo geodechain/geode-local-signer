@@ -1,6 +1,6 @@
 {
   "name": "@geodechain/local-signer",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Signs Geode blockchain transactions on your own machine for AI agents using the Geode MCP server. Verifies every transaction independently; keys never leave your computer.",
   "license": "Apache-2.0",
   "author": "The Geode Foundation Inc",
